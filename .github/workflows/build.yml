@@ -1,4 +1,4 @@
-name: Build Moto G6 Play (jeter) NetHunter Kernel
+name: Build Moto G6 Play (jeter) Kernel (Ubuntu-Native Baseline)
 
 on:
   push:
@@ -7,20 +7,21 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     env:
       OUT_DIR: out
-      kernelName: JeterNethunter
-      kernelRepo: https://github.com/LineageOS/android_kernel_motorola_msm8937.git
-      kernelBranch: lineage-18.1
+      KERNEL_NAME: JeterNethunter
+      KERNEL_REPO: https://github.com/LineageOS/android_kernel_motorola_msm8937.git
+      KERNEL_BRANCH: lineage-18.1
+      # Baseline defconfig for stability; Phase 2 switches to jeter_defconfig
       DEFCONFIG_NAME: msm8937-perf_defconfig
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Install build dependencies
+      - name: Install build dependencies (Ubuntu-native)
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -28,13 +29,14 @@ jobs:
             gcc-arm-linux-gnueabi \
             git zip
 
-      - name: Clone LineageOS kernel
+      - name: Clone kernel source
         run: |
-          git clone --recursive --branch "$kernelBranch" \
-            "$kernelRepo" "$kernelName" --depth=1
+          git clone --recursive --branch "$KERNEL_BRANCH" \
+            "$KERNEL_REPO" "$KERNEL_NAME" --depth=1
 
-      - name: Build kernel
-        working-directory: ${{ env.kernelName }}
+      - name: Build kernel (verbose)
+        id: kernel_build
+        working-directory: ${{ env.KERNEL_NAME }}
         run: |
           export ARCH=arm
           export SUBARCH=arm
@@ -45,29 +47,30 @@ jobs:
 
           mkdir -p "$OUT_DIR"
 
-          echo "=== Running defconfig ==="
-          make O="$OUT_DIR" "$DEFCONFIG_NAME"
+          echo "=== Running defconfig: $DEFCONFIG_NAME ==="
+          make O="$OUT_DIR" "$DEFCONFIG_NAME" V=1
 
           echo "=== Building kernel ==="
-          make -j"$(nproc)" O="$OUT_DIR"
-        id: kernel_build
+          make -j"$(nproc)" O="$OUT_DIR" V=1
 
-      - name: Retry Build on Failure
+      - name: Retry build on failure
         if: failure() && steps.kernel_build.outcome == 'failure'
-        working-directory: ${{ env.kernelName }}
+        working-directory: ${{ env.KERNEL_NAME }}
         run: |
           echo "=== First attempt failed. Cleaning and retrying... ==="
-          make clean O="$OUT_DIR"
-          make O="$OUT_DIR" "$DEFCONFIG_NAME"
-          make -j"$(nproc)" O="$OUT_DIR"
+          make O="$OUT_DIR" clean
+          make O="$OUT_DIR" "$DEFCONFIG_NAME" V=1
+          make -j"$(nproc)" O="$OUT_DIR" V=1
 
       - name: Collect artifacts
+        if: always()
         run: |
           mkdir -p artifacts
-          cp -v $kernelName/$OUT_DIR/arch/arm/boot/zImage artifacts/ || true
-          cp -vr $kernelName/$OUT_DIR/arch/arm/boot/dts artifacts/dts || true
+          cp -v $KERNEL_NAME/$OUT_DIR/arch/arm/boot/zImage artifacts/ || true
+          cp -vr $KERNEL_NAME/$OUT_DIR/arch/arm/boot/dts artifacts/dts || true
 
       - name: Upload artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: jeter-kernel-build
