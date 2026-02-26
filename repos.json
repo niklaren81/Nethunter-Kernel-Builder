@@ -8,14 +8,18 @@
       "defconfig": "jeter_defconfig"
     },
     "withKernelSU": false,
+
     "toolchains": [
       {
         "repo": "https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9",
         "branch": "master",
         "name": "gcc-arm",
-        "binaryEnv": ["$GITHUB_WORKSPACE/gcc-arm/bin"]
+        "binaryEnv": [
+          "$GITHUB_WORKSPACE/gcc-arm/bin"
+        ]
       }
     ],
+
     "params": {
       "ARCH": "arm",
       "SUBARCH": "arm",
@@ -24,6 +28,7 @@
       "HOSTCFLAGS": "-fcommon",
       "CFLAGS_KERNEL": "-Wno-error=attribute-alias"
     },
+
     "AnyKernel3": {
       "use": false,
       "release": false
