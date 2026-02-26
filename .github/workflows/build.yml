@@ -14,7 +14,7 @@ jobs:
       kernelName: JeterNethunter
       kernelRepo: https://github.com/LineageOS/android_kernel_motorola_msm8937.git
       kernelBranch: lineage-18.1
-      DEFCONFIG_NAME: jeter_defconfig
+      DEFCONFIG_NAME: msm8937-perf_defconfig
 
     steps:
       - name: Checkout repo
