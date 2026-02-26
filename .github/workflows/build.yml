@@ -38,8 +38,10 @@ jobs:
         run: |
           export ARCH=arm
           export SUBARCH=arm
-          export CROSS_COMPILE=arm-linux-androideabi-
+          export CROSS_COMPILE=arm-linux-gnueabi-
           export ANDROID_MAJOR_VERSION=r
+          export HOSTCFLAGS="-fcommon"
+          export CFLAGS_KERNEL="-Wno-error=attribute-alias"
 
           mkdir -p "$OUT_DIR"
 
