@@ -1,0 +1,72 @@
+name: Build Moto G6 Play (jeter) NetHunter Kernel
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      OUT_DIR: out
+      kernelName: JeterNethunter
+      kernelRepo: https://github.com/LineageOS/android_kernel_motorola_msm8937.git
+      kernelBranch: lineage-18.1
+      DEFCONFIG_NAME: jeter_defconfig
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            bc bison flex libssl-dev make \
+            gcc-arm-linux-gnueabi \
+            git zip
+
+      - name: Clone LineageOS kernel
+        run: |
+          git clone --recursive --branch "$kernelBranch" \
+            "$kernelRepo" "$kernelName" --depth=1
+
+      - name: Build kernel
+        working-directory: ${{ env.kernelName }}
+        run: |
+          export ARCH=arm
+          export SUBARCH=arm
+          export CROSS_COMPILE=arm-linux-androideabi-
+          export ANDROID_MAJOR_VERSION=r
+
+          mkdir -p "$OUT_DIR"
+
+          echo "=== Running defconfig ==="
+          make O="$OUT_DIR" "$DEFCONFIG_NAME"
+
+          echo "=== Building kernel ==="
+          make -j"$(nproc)" O="$OUT_DIR"
+        id: kernel_build
+
+      - name: Retry Build on Failure
+        if: failure() && steps.kernel_build.outcome == 'failure'
+        working-directory: ${{ env.kernelName }}
+        run: |
+          echo "=== First attempt failed. Cleaning and retrying... ==="
+          make clean O="$OUT_DIR"
+          make O="$OUT_DIR" "$DEFCONFIG_NAME"
+          make -j"$(nproc)" O="$OUT_DIR"
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p artifacts
+          cp -v $kernelName/$OUT_DIR/arch/arm/boot/zImage artifacts/ || true
+          cp -vr $kernelName/$OUT_DIR/arch/arm/boot/dts artifacts/dts || true
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: jeter-kernel-build
+          path: artifacts

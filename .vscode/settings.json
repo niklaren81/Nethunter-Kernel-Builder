@@ -1,0 +1,33 @@
+{
+    // IntelliSense
+    "C_Cpp.default.configurationProvider": "ms-vscode.cpptools",
+    "files.associations": {
+        "*.sh": "shell",
+        "*.ps1": "powershell",
+        "*.json": "jsonc"
+    },
+    "files.exclude": {
+        "**/JeterNethunter": true,
+        "**/out": true,
+        "**/artifacts": true,
+        "**/output": true
+    },
+    // Terminal settings
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+    "terminal.integrated.profiles.windows": {
+        "PowerShell": {
+            "source": "PowerShell",
+            "icon": "terminal-powershell"
+        },
+        "Command Prompt": {
+            "source": "Command Prompt",
+            "icon": "terminal-cmd"
+        }
+    },
+    // Shell scripts
+    "[shell]": {
+        "editor.defaultFormatter": "shanlunari.run-in-wsl"
+    },
+    // JSON with comments
+    "jsonc.enable": true
+}

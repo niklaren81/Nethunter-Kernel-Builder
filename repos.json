@@ -1,0 +1,32 @@
+[
+  {
+    "kernelSource": {
+      "name": "JeterNethunter",
+      "repo": "https://github.com/LineageOS/android_kernel_motorola_msm8937.git",
+      "branch": "lineage-18.1",
+      "device": "jeter",
+      "defconfig": "jeter_defconfig"
+    },
+    "withKernelSU": false,
+    "toolchains": [
+      {
+        "repo": "https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9",
+        "branch": "master",
+        "name": "gcc-arm",
+        "binaryEnv": ["$GITHUB_WORKSPACE/gcc-arm/bin"]
+      }
+    ],
+    "params": {
+      "ARCH": "arm",
+      "SUBARCH": "arm",
+      "CROSS_COMPILE": "arm-linux-androideabi-",
+      "ANDROID_MAJOR_VERSION": "r",
+      "HOSTCFLAGS": "-fcommon",
+      "CFLAGS_KERNEL": "-Wno-error=attribute-alias"
+    },
+    "AnyKernel3": {
+      "use": false,
+      "release": false
+    }
+  }
+]

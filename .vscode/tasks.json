@@ -1,0 +1,64 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build: Docker (Recommended for Windows)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-File",
+                "${workspaceFolder}/build-docker.ps1"
+            ],
+            "group": "build",
+            "problemMatcher": [],
+            "detail": "Build kernel using Docker container (recommended for Windows)"
+        },
+        {
+            "label": "Build: WSL",
+            "type": "shell",
+            "command": "wsl",
+            "args": [
+                "bash",
+                "${workspaceFolder}/build-wsl.sh"
+            ],
+            "group": "build",
+            "problemMatcher": [],
+            "detail": "Build kernel using WSL (requires WSL2 with Ubuntu)"
+        },
+        {
+            "label": "Build: Local (Linux only)",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "${workspaceFolder}/build-local.sh"
+            ],
+            "group": "build",
+            "problemMatcher": [],
+            "detail": "Build kernel locally (requires Linux with ARM cross-compiler)"
+        },
+        {
+            "label": "Clean: Remove build artifacts",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-Command",
+                "Remove-Item -Path 'output' -Recurse -Force -ErrorAction SilentlyContinue; Remove-Item -Path 'artifacts' -Recurse -Force -ErrorAction SilentlyContinue; Write-Host 'Cleaned output and artifacts directories'"
+            ],
+            "group": "build",
+            "problemMatcher": [],
+            "detail": "Remove build output and artifacts"
+        },
+        {
+            "label": "Setup: Install WSL",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-Command",
+                "wsl --install -d Ubuntu"
+            ],
+            "group": "none",
+            "problemMatcher": [],
+            "detail": "Install WSL2 with Ubuntu for kernel building"
+        }
+    ]
+}

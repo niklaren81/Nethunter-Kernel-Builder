@@ -1,0 +1,22 @@
+{
+    "version": "0.2.1",
+    "configurations": [
+        {
+            "name": "Docker: Build Kernel",
+            "type": "docker",
+            "request": "launch",
+            "preLaunchTask": "Build: Docker (Recommended for Windows)",
+            "dockerCompose": {
+                "service": "nethunter-jeter-builder",
+                "filename": "Dockerfile"
+            }
+        },
+        {
+            "name": "WSL: Build Kernel",
+            "type": "wsl",
+            "request": "launch",
+            "preLaunchTask": "Build: WSL",
+            "wslDistribution": "Ubuntu"
+        }
+    ]
+}
